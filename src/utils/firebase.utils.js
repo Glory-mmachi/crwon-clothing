@@ -6,6 +6,8 @@ import {
   // signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  // signInWithEmailAndPassword,
 } from "firebase/auth";
 
 //for storing data in firestore
@@ -23,28 +25,37 @@ const firebaseConfig = {
 
 // Initialize Firebase
 initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
 
 //For aunthentication
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+// export const signInWithGoogleRedirect = () =>
+//   signInWithRedirect(auth, googleProvider);
 
 //using firestore to store the data.
-export const db = getFirestore();
 
-export const craeteUserDocumentFRomAuth = async (userAuth) => {
-  const userDocRef = doc(db, "users", userAuth.uid);
+//initialize the service
+export const db = getFirestore(); //database(db) is used to get the database in firestor
 
+export const craeteUserDocumentFRomAuth = async (
+  userAuth,
+  additionalInfo = {}
+) => {
+  //getting the collection reference(like an ID)
+  const userDocRef = doc(db, "users", userAuth.uid); //database(db),users collection, users' ID(uid)
   console.log(userDocRef);
 
-  const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
+  //get the collection document data
+  const userSnapshot = await getDoc(userDocRef); //returns a promise
+
+  console.log(userSnapshot); //userSnapshot has acces to all of the document in the collection
+  console.log(userSnapshot.exists()); //checks if the doc exist in the collection
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -54,10 +65,20 @@ export const craeteUserDocumentFRomAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        ...additionalInfo,
       });
     } catch (error) {
       console.log("error creating the user", error.message);
     }
     return userDocRef;
   }
+};
+
+export const createAuhtUserWithGoogleEmailAndPassword = async (
+  email,
+  password
+) => {
+  if (!email || !password) return;
+
+  return createUserWithEmailAndPassword(auth, email, password);
 };
