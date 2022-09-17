@@ -4,7 +4,6 @@ import {
   craeteUserDocumentFRomAuth,
 } from "../../utils/firebase.utils";
 import FormInput from "../form-input/form-input.component";
-import "./sign-up-form.style.scss";
 import Button from "../button/button.component";
 const defaultFormFields = {
   displayName: "",
@@ -90,9 +89,7 @@ const SignUpForm = () => {
           value={confirmPassword}
           required
         />
-        <Button buttonType="google" type="submit">
-          Sign up
-        </Button>
+        <Button type="submit">Sign up</Button>
       </form>
     </div>
   );
