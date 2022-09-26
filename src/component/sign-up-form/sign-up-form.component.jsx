@@ -16,7 +16,6 @@ const SignUpForm = () => {
   const [formField, setFormField] = useState(defaultFormFields);
 
   const { displayName, email, password, confirmPassword } = formField;
-  console.log(formField);
 
   const hanldeSubmit = async (event) => {
     event.preventDefault();
@@ -29,7 +28,6 @@ const SignUpForm = () => {
         email,
         password
       );
-      console.log(user);
       await craeteUserDocumentFRomAuth(user, { displayName });
       setFormField(defaultFormFields);
     } catch (error) {
