@@ -13,7 +13,16 @@ import {
 } from "firebase/auth";
 
 //for storing data in firestore
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC5G7dL-G7VZjCGd7GXzxpJ-kvcDKgOgZo",
@@ -46,6 +55,31 @@ export const signInWithGooglePopup = () =>
 //USING FIRESTORE TO STORE THE DATA
 //initialize the service
 export const db = getFirestore(); //database(db) is used to get the database in firestore
+
+export const addCollectionAndDocument = async (collectionKey, objectsToAdd) => {
+  const collectionRef = collection(db, collectionKey);
+  const batch = writeBatch(db);
+
+  objectsToAdd.forEach((Object) => {
+    const docRef = doc(collectionRef, Object.title.toLowerCase());
+    batch.set(docRef, Object);
+  });
+
+  await batch.commit();
+};
+
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, "categories");
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+  const categoryMap = querySnapshot.docs.reduce((acc, quaryDoc) => {
+    const { title, items } = quaryDoc.data();
+    acc[title.toLowerCase()] = items;
+    return acc;
+  }, {});
+  return categoryMap;
+};
 
 export const craeteUserDocumentFRomAuth = async (
   userAuth,
